@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, MessagesSquare, Radar, Sparkles } from 'lucid
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
+import { Avatar } from '../components/ui/Avatar'
 import { ProductPreview } from '../components/ProductPreview'
 import type { Page } from '../types'
 
@@ -19,7 +20,7 @@ export function HomePage({ onLogin, onNavigate }: { onLogin: () => void; onNavig
               <Button size="large" onClick={onLogin}>Start for free <ArrowRight size={18} /></Button>
               <Button size="large" variant="secondary" onClick={() => onNavigate('product')}>See how it works</Button>
             </div>
-            <div className="hero__proof"><span><CheckCircle2 /> No card required</span><span><CheckCircle2 /> Setup in 4 minutes</span></div>
+            <div className="hero__proof"><span><CheckCircle2 /> No card required</span><span><CheckCircle2 /> Setup in 4 minutes</span><span className="hero__voices"><Avatar name="Jordan Davis" size="small" /><Avatar name="Maya Kim" size="small" /><b>146 teams listening</b></span></div>
           </div>
           <ProductPreview />
         </div>

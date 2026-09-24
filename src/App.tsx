@@ -5,6 +5,7 @@ import { LoginDialog } from './components/LoginDialog'
 import { HomePage } from './pages/HomePage'
 import { PricingPage } from './pages/PricingPage'
 import { ProductPage } from './pages/ProductPage'
+import { DashboardPage } from './pages/DashboardPage'
 import type { Page } from './types'
 
 const pathToPage = (path: string): Page => path === '/pricing' ? 'pricing' : path === '/how-it-works' ? 'product' : 'home'
@@ -13,6 +14,7 @@ const pageToPath: Record<Page, string> = { home: '/', product: '/how-it-works', 
 export function App() {
   const [page, setPage] = useState<Page>(() => pathToPage(window.location.pathname))
   const [loginOpen, setLoginOpen] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
   useEffect(() => {
     const updatePage = () => setPage(pathToPage(window.location.pathname))
@@ -26,6 +28,10 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  if (userEmail) {
+    return <DashboardPage email={userEmail} onLogout={() => { setUserEmail(null); navigate('home') }} />
+  }
+
   return (
     <div className="app-shell">
       <Header activePage={page} onNavigate={navigate} onLogin={() => setLoginOpen(true)} />
@@ -33,7 +39,7 @@ export function App() {
       {page === 'product' && <ProductPage onLogin={() => setLoginOpen(true)} />}
       {page === 'pricing' && <PricingPage onLogin={() => setLoginOpen(true)} />}
       <Footer onNavigate={navigate} />
-      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} onAuthenticated={(email) => { setUserEmail(email); setLoginOpen(false) }} />
     </div>
   )
 }

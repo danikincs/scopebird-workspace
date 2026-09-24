@@ -1,54 +1,39 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Check, X } from 'lucide-react'
+import { useState, type FormEvent } from 'react'
 import { Button } from './ui/Button'
 import { Logo } from './Logo'
+import { Dialog } from './ui/Dialog'
+import { FormField, Input } from './ui/Input'
 
-export function LoginDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
+export function LoginDialog({ open, onClose, onAuthenticated }: { open: boolean; onClose: () => void; onAuthenticated: (email: string) => void }) {
   const [email, setEmail] = useState('demo@scopebird.app')
   const [password, setPassword] = useState('definitely-a-real-password')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (open && dialog && !dialog.open) dialog.showModal()
-    if (!open && dialog?.open) dialog.close()
-  }, [open])
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (email.trim() && password.trim()) setIsLoggedIn(true)
+    if (email.trim() && password.trim()) onAuthenticated(email.trim())
   }
 
   const close = () => {
-    setIsLoggedIn(false)
     onClose()
   }
 
   return (
-    <dialog ref={dialogRef} className="login-dialog" onClose={close} onClick={(event) => event.target === dialogRef.current && close()}>
-      <button className="dialog-close" onClick={close} aria-label="Close login"><X size={20} /></button>
-      {isLoggedIn ? (
-        <div className="login-success">
-          <span className="success-mark"><Check /></span>
-          <h2>You’re in.</h2>
-          <p>Your imaginary workspace is looking unusually organized.</p>
-          <Button onClick={close} fullWidth>Enter workspace</Button>
-        </div>
-      ) : (
-        <form className="login-form" onSubmit={submit}>
+    <Dialog open={open} title={mode === 'login' ? 'Log in to Scopebird' : 'Create your workspace'} onClose={close}>
+      <form className="login-form" onSubmit={submit}>
           <Logo compact />
           <div>
-            <p className="eyebrow">Welcome back</p>
-            <h2>Log in to Scopebird</h2>
-            <p>We filled this in for the demo. Change it if you feel rebellious.</p>
+            <p className="eyebrow">{mode === 'login' ? 'Welcome back' : 'Start listening'}</p>
+            <p>{mode === 'login' ? 'Your customer signal is waiting.' : 'Bring your customer requests into one calm place.'}</p>
           </div>
-          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoFocus required /></label>
-          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
-          <Button type="submit" size="large" fullWidth>Log in</Button>
+          <FormField label="Email" hint="Use any email for this demo"><Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoFocus required /></FormField>
+          <FormField label="Password"><Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></FormField>
+          <Button type="submit" size="large" fullWidth>{mode === 'login' ? 'Log in' : 'Create workspace'}</Button>
           <small>Any non-empty email and password will work.</small>
-        </form>
-      )}
-    </dialog>
+          <button type="button" className="login-switch" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}>
+            {mode === 'login' ? 'New to Scopebird? Create an account' : 'Already have an account? Log in'}
+          </button>
+      </form>
+    </Dialog>
   )
 }
